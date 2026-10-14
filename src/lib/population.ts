@@ -1,6 +1,5 @@
 import populationMain from "../assets/populationMain.json";
 
-// Valeurs possibles des 3 paramètres (même construction que dans l'énoncé du TP)
 export const listePeriode = [...new Set(populationMain?.map((d) => d.Période))].sort().reverse();
 export const listeSexe = ["Total", ...new Set(populationMain?.map((d) => d.Sexe).filter((s) => s !== "Total"))];
 export const listeAge = ["Total", ...new Set(populationMain?.map((d) => d["Âge"]).filter((a) => a !== "Total"))];
@@ -11,7 +10,6 @@ export function existe(year: number, sex: string, age: string) {
   return combinaisons.has(`${year}|${sex}|${age}`);
 }
 
-// Nom utilisable dans une URL : "De 15 à 24 ans " -> "de-15-a-24-ans"
 export function slug(texte: string | number) {
   return String(texte)
     .normalize("NFD")
@@ -21,12 +19,10 @@ export function slug(texte: string | number) {
     .replace(/[^a-z0-9]+/g, "-");
 }
 
-// URL de la page serveur pré-générée pour une combinaison de filtres
 export function urlServeur(year: number, sex: string, age: string) {
   return `/geojson/serveur/${year}/${slug(sex)}/${slug(age)}`;
 }
 
-// Population par nom de département pour une année, un sexe et une tranche d'âge
 export function getPopulation(year: number, sex: string, age: string) {
   return new Map(
     populationMain
@@ -35,7 +31,6 @@ export function getPopulation(year: number, sex: string, age: string) {
   );
 }
 
-// Options Plot de la carte, partagées entre la version serveur et la version client
 export function optionsCarte(Plot: typeof import("@observablehq/plot"), departements: any, year: number, sex: string, age: string) {
   const population = getPopulation(year, sex, age);
   const label = (d: any) =>
@@ -52,7 +47,7 @@ export function optionsCarte(Plot: typeof import("@observablehq/plot"), departem
     projection: { type: "conic-conformal", parallels: [44, 49], rotate: [-3, 0], domain: departements },
     width: 700,
     height: 650,
-    // Échelle par quantiles : la légende continue a besoin d'un canvas, absent de jsdom côté serveur
+    // Pas de légende continue : elle nécessite un canvas, absent de jsdom
     color: {
       type: "quantile",
       n: 7,
@@ -62,7 +57,6 @@ export function optionsCarte(Plot: typeof import("@observablehq/plot"), departem
       tickFormat: (d: number) => Math.round(d).toLocaleString("fr-FR"),
     },
     marks: [
-      // Fond : tous les départements, même sans donnée
       Plot.geo(departements, { fill: "#e2e8f0", stroke: "white", strokeWidth: 0.5 }),
       Plot.geo(departements, {
         filter: (d: any) => population.has(d.properties.nom),

@@ -2,7 +2,7 @@
 import CarteServeur from "../../../../../components/CarteServeur.astro";
 import { existe, listeAge, listePeriode, listeSexe, slug } from "../../../../../lib/population";
 
-// Une page statique par combinaison qui a des données (site 100 % statique, sans fonction Netlify)
+// Pages pré-générées : pas de fonction Netlify nécessaire
 export function getStaticPaths() {
   return listePeriode.flatMap((year) =>
     listeSexe.flatMap((sex) =>

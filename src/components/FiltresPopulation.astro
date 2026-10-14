@@ -1,7 +1,6 @@
 ---
 import { existe, listeAge, listePeriode, listeSexe, urlServeur } from "../lib/population";
 
-// Valeurs sélectionnées (par défaut : la première de chaque liste)
 const { year = listePeriode[0], sex = listeSexe[0], age = listeAge[0], serveur = false } = Astro.props;
 
 const selectClass =
@@ -9,8 +8,6 @@ const selectClass =
 const labelClass = "flex flex-col gap-1 text-sm font-medium text-slate-700";
 ---
 
-<!-- Les options sans données pour les autres filtres sont désactivées -->
-<!-- Côté serveur : chaque option connaît l'URL de la page pré-générée à ouvrir (data-url) -->
 <form class="grid items-end gap-4 sm:grid-cols-3" aria-label="Filtres de la carte" data-serveur={serveur ? "" : undefined}>
   <label class={labelClass}>
     Année
@@ -33,7 +30,6 @@ const labelClass = "flex flex-col gap-1 text-sm font-medium text-slate-700";
 </form>
 
 <script>
-  // Version serveur : changer un filtre ouvre la page pré-générée correspondante
   const form = document.querySelector<HTMLFormElement>("form[data-serveur]");
   form?.addEventListener("change", (e) => {
     const url = (e.target as HTMLSelectElement).selectedOptions[0]?.dataset.url;

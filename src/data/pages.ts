@@ -1,4 +1,3 @@
-// Liste des pages du site : utilisée par la navigation et par le hub d'accueil
 export const pages = [
   {
     href: "/accessibilite",

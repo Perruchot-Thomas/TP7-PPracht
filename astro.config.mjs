@@ -9,8 +9,7 @@ import netlify from '@astrojs/netlify';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
-    // Pré-optimise les bibliothèques utilisées côté client dès le démarrage du serveur de dev
-    // (évite les erreurs 504 "Outdated Optimize Dep" et la carte qui ne s'affiche pas)
+    // Évite les erreurs 504 "Outdated Optimize Dep" en dev
     optimizeDeps: {
       include: ["@observablehq/plot", "leaflet"]
     }

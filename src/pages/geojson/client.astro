@@ -27,7 +27,6 @@ import Layout from "../../layouts/Layout.astro";
   const elmAge = document.getElementById("age") as HTMLSelectElement;
   const elmCarte = document.getElementById("carte") as HTMLDivElement;
 
-  // Désactive les options qui n'ont pas de données avec les autres filtres
   function majOptions() {
     for (const o of elmYear.options) o.disabled = !existe(Number(o.value), elmSex.value, elmAge.value);
     for (const o of elmSex.options) o.disabled = !existe(Number(elmYear.value), o.value, elmAge.value);
