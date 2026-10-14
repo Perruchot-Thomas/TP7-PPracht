@@ -1,21 +1,48 @@
 ---
+import Card from "../components/Card.astro";
 import PlotFigure from "../components/PlotFigure.astro";
 import Layout from "../layouts/Layout.astro";
 import * as Plot from "@observablehq/plot";
 import penguins from "../assets/penguins.json";
 ---
 
-<Layout>
-  <h1 class="text-2xl">Test Astro et Plot (Observablehq)</h1>
-  <PlotFigure
-    options={{
-      marks: [
-        Plot.dot(penguins, {
-          x: "culmen_length_mm",
-          y: "culmen_depth_mm",
-          stroke: "species",
-        }),
-      ],
-    }}
-  />
+<Layout
+  title="Accessibilité des graphiques"
+  description="Deux façons de rendre un graphique Plot accessible : laisser Plot générer figure/figcaption, ou les écrire soi-même."
+>
+  <Card titre="Option 1 : title, subtitle et caption de Plot">
+    <PlotFigure
+      options={{
+        title: "Longueur et profondeur du bec des manchots",
+        subtitle: "Chaque point est un manchot, coloré selon son espèce",
+        caption: "Figure 1. Données penguins (Palmer Archipelago).",
+        ariaLabel: "Nuage de points : longueur du bec en abscisse, profondeur du bec en ordonnée, par espèce",
+        ariaDescription: "Les manchots Gentoo ont un bec plus long mais moins profond que les Adelie.",
+        color: { legend: true },
+        marks: [
+          Plot.dot(penguins, {
+            x: "culmen_length_mm",
+            y: "culmen_depth_mm",
+            stroke: "species",
+          }),
+        ],
+      }}
+    />
+  </Card>
+
+  <Card titre="Option 2 : figure et figcaption faits à la main">
+    <figure>
+      <PlotFigure
+        options={{
+          ariaLabel: "Histogramme du nombre de manchots par île",
+          marks: [
+            Plot.barY(penguins, Plot.groupX({ y: "count" }, { x: "island", fill: "species" })),
+            Plot.ruleY([0]),
+          ],
+          color: { legend: true },
+        }}
+      />
+      <figcaption class="mt-2 text-sm text-slate-500">Figure 2. Nombre de manchots par île et par espèce.</figcaption>
+    </figure>
+  </Card>
 </Layout>

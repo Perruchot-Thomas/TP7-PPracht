@@ -6,4 +6,4 @@ const { options } = Astro.props;
 const plot = Plot.plot({ ...options, document: new JSDOM("").window.document });
 ---
 
-<div set:html={plot.outerHTML} />
+<div class="overflow-x-auto" set:html={plot.outerHTML} />

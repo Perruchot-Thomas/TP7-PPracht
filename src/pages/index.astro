@@ -1,0 +1,29 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { pages } from "../data/pages";
+---
+
+<Layout
+  title="TP7 - Astro, Plot et Leaflet"
+  description="Accédez aux différentes parties du TP : accessibilité des graphiques, carte Leaflet et cartes GeoJSON avec Observable Plot."
+>
+  <ul class="grid gap-6 sm:grid-cols-2">
+    {
+      pages.map((p) => (
+        <li>
+          <a
+            href={p.href}
+            class="group flex h-full flex-col gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            <span class="w-fit rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+              {p.tag}
+            </span>
+            <h2 class="text-lg font-semibold text-slate-900 group-hover:text-indigo-700">{p.titre}</h2>
+            <p class="text-sm text-slate-600">{p.description}</p>
+            <span class="mt-auto text-sm font-medium text-indigo-600" aria-hidden="true">Ouvrir →</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>

@@ -1,0 +1,48 @@
+---
+import Card from "../../components/Card.astro";
+import PlotFigure from "../../components/PlotFigure.astro";
+import Layout from "../../layouts/Layout.astro";
+import * as Plot from "@observablehq/plot";
+import departements from "../../assets/departements.geojson.json";
+import populationMain from "../../assets/populationMain.json";
+
+// Paramètres fixes (côté serveur)
+const selectedYear = 2021;
+const selectedSex = "Total";
+const selectedAge = "Total";
+
+// Population par nom de département pour les paramètres choisis
+const population = new Map(
+  populationMain
+    .filter((d) => d.Période === selectedYear && d.Sexe === selectedSex && d["Âge"] === selectedAge)
+    .map((d) => [d["Géographie"], d.Valeur]),
+);
+---
+
+<Layout
+  title="Population par département (serveur)"
+  description="Carte générée au moment du build avec Observable Plot et jsdom : aucun JavaScript côté navigateur."
+>
+  <Card>
+    <PlotFigure
+      options={{
+        title: `Population par département en ${selectedYear}`,
+        subtitle: `Sexe : ${selectedSex} — Âge : ${selectedAge}`,
+        caption: "Source : INSEE, recensement de la population.",
+        ariaLabel: "Carte choroplèthe de la population par département de France métropolitaine",
+        projection: { type: "conic-conformal", parallels: [44, 49], rotate: [-3, 0], domain: departements },
+        width: 700,
+        height: 650,
+        color: { type: "quantile", n: 7, scheme: "blues", legend: true, label: "Population", tickFormat: (d) => Math.round(d).toLocaleString("fr-FR") },
+        marks: [
+          Plot.geo(departements, {
+            fill: (d) => population.get(d.properties.nom),
+            stroke: "white",
+            strokeWidth: 0.5,
+            title: (d) => `${d.properties.nom} (${d.properties.code}) : ${population.get(d.properties.nom)?.toLocaleString("fr-FR") ?? "n.c."}`,
+          }),
+        ],
+      }}
+    />
+  </Card>
+</Layout>

@@ -1,0 +1,53 @@
+---
+import Card from "../components/Card.astro";
+import Layout from "../layouts/Layout.astro";
+// Import des styles CSS de Leaflet pour l'affichage de la carte
+import "leaflet/dist/leaflet.css";
+---
+
+<Layout
+  title="Carte des établissements"
+  description="Carte Leaflet des établissements de l'enseignement supérieur. Cliquez sur un marqueur pour afficher son nom."
+>
+  <Card>
+    <figure>
+      <div
+        id="map"
+        role="region"
+        aria-label="Carte interactive des établissements"
+        class="isolate h-[600px] w-full overflow-hidden rounded-lg border border-slate-200"
+      >
+      </div>
+      <figcaption class="mt-2 text-sm text-slate-500">
+        Localisation des établissements de l'enseignement supérieur.
+      </figcaption>
+    </figure>
+  </Card>
+</Layout>
+
+<script>
+  import listeEtablissements from "../assets/listeEtablissements.json";
+  import L from "leaflet";
+  import markerIcon from "leaflet/dist/images/marker-icon.png";
+  import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+  import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+  L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon.src,
+    iconRetinaUrl: markerIcon2x.src,
+    shadowUrl: markerShadow.src,
+  });
+
+  const map = L.map("map").setView([46.6033, 1.883], 6);
+
+  // Fond de carte OpenStreetMap (https://leafletjs.com/examples/quick-start/)
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+
+  for (const { name, lat, lon } of listeEtablissements) {
+    if (lat == null || lon == null) continue;
+    L.marker([lat, lon], { title: name }).addTo(map).bindPopup(name);
+  }
+</script>
