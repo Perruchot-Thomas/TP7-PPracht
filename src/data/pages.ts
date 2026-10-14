@@ -15,7 +15,7 @@ export const pages = [
   {
     href: "/geojson/serveur",
     titre: "GeoJSON (serveur)",
-    description: "Population par département, carte générée côté serveur avec Plot.",
+    description: "Carte générée sur le serveur avec Plot, filtrable par année, sexe et âge via un formulaire.",
     tag: "Plot",
   },
   {

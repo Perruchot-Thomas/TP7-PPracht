@@ -1,39 +1,15 @@
 ---
 import Card from "../../components/Card.astro";
+import FiltresPopulation from "../../components/FiltresPopulation.astro";
 import Layout from "../../layouts/Layout.astro";
-import populationMain from "../../assets/populationMain.json";
-
-// Listes des valeurs possibles pour les SELECT (calculées côté serveur)
-const listePeriode = [...new Set(populationMain.map((d) => d.Période))].sort().reverse();
-const listeSexe = [...new Set(populationMain.map((d) => d.Sexe))].sort((a, b) => (a === "Total" ? -1 : b === "Total" ? 1 : a.localeCompare(b)));
-const listeAge = [...new Set(populationMain.map((d) => d["Âge"]))].sort((a, b) => (a === "Total" ? -1 : b === "Total" ? 1 : a.localeCompare(b)));
 ---
 
 <Layout
   title="Population par département (client)"
-  description="La carte est recalculée dans le navigateur à chaque changement de filtre."
+  description="La carte est recalculée dans le navigateur à chaque changement de filtre, sans recharger la page."
 >
   <Card titre="Filtres">
-    <form class="grid gap-4 sm:grid-cols-3" aria-label="Filtres de la carte">
-      <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-        Année
-        <select id="periode" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-          {listePeriode.map((p, i) => <option selected={i === 0}>{p}</option>)}
-        </select>
-      </label>
-      <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-        Sexe
-        <select id="sexe" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-          {listeSexe.map((s, i) => <option selected={i === 0}>{s}</option>)}
-        </select>
-      </label>
-      <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
-        Âge
-        <select id="age" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
-          {listeAge.map((a, i) => <option value={a} selected={i === 0}>{a.trim()}</option>)}
-        </select>
-      </label>
-    </form>
+    <FiltresPopulation />
   </Card>
 
   <Card>
@@ -44,45 +20,27 @@ const listeAge = [...new Set(populationMain.map((d) => d["Âge"]))].sort((a, b) 
 <script>
   import * as Plot from "@observablehq/plot";
   import departements from "../../assets/departements.geojson.json";
-  import populationMain from "../../assets/populationMain.json";
+  import { existe, optionsCarte } from "../../lib/population";
 
   const elmYear = document.getElementById("periode") as HTMLSelectElement;
   const elmSex = document.getElementById("sexe") as HTMLSelectElement;
   const elmAge = document.getElementById("age") as HTMLSelectElement;
   const elmCarte = document.getElementById("carte") as HTMLDivElement;
 
+  // Désactive les options qui n'ont pas de données avec les autres filtres
+  function majOptions() {
+    for (const o of elmYear.options) o.disabled = !existe(Number(o.value), elmSex.value, elmAge.value);
+    for (const o of elmSex.options) o.disabled = !existe(Number(elmYear.value), o.value, elmAge.value);
+    for (const o of elmAge.options) o.disabled = !existe(Number(elmYear.value), elmSex.value, o.value);
+  }
+
   function draw() {
+    majOptions();
     const selectedYear = Number(elmYear.value);
     const selectedSex = elmSex.value;
     const selectedAge = elmAge.value;
 
-    const population = new Map(
-      populationMain
-        .filter((d) => d.Période === selectedYear && d.Sexe === selectedSex && d["Âge"] === selectedAge)
-        .map((d) => [d["Géographie"], d.Valeur]),
-    );
-
-    const plot = Plot.plot({
-      title: `Population par département en ${selectedYear}`,
-      subtitle: `Sexe : ${selectedSex} — Âge : ${selectedAge.trim()}`,
-      caption: "Source : INSEE, recensement de la population.",
-      ariaLabel: "Carte choroplèthe de la population par département de France métropolitaine",
-      projection: { type: "conic-conformal", parallels: [44, 49], rotate: [-3, 0], domain: departements as any },
-      width: 700,
-      height: 650,
-      color: { type: "quantile", n: 7, scheme: "blues", legend: true, label: "Population", tickFormat: (d: number) => Math.round(d).toLocaleString("fr-FR") },
-      marks: [
-        Plot.geo(departements as any, {
-          fill: (d: any) => population.get(d.properties.nom),
-          stroke: "white",
-          strokeWidth: 0.5,
-          tip: true,
-          title: (d: any) =>
-            `${d.properties.nom} (${d.properties.code}) : ${population.get(d.properties.nom)?.toLocaleString("fr-FR") ?? "n.c."}`,
-        }),
-      ],
-    });
-
+    const plot = Plot.plot(optionsCarte(Plot, departements, selectedYear, selectedSex, selectedAge) as Plot.PlotOptions);
     elmCarte.replaceChildren(plot);
   }
 

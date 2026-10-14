@@ -1,0 +1,48 @@
+---
+import { existe, listeAge, listePeriode, listeSexe } from "../lib/population";
+
+// Valeurs sélectionnées (par défaut : la première de chaque liste)
+const { year = listePeriode[0], sex = listeSexe[0], age = listeAge[0], serveur = false } = Astro.props;
+
+const selectClass =
+  "rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200";
+const labelClass = "flex flex-col gap-1 text-sm font-medium text-slate-700";
+---
+
+<!-- Les options sans données pour les autres filtres sont désactivées -->
+<!-- Côté serveur : formulaire GET qui recharge la page avec ?year=…&sex=…&age=… -->
+<form
+  method="get"
+  class="grid items-end gap-4 sm:grid-cols-4"
+  aria-label="Filtres de la carte"
+  onchange={serveur ? "this.requestSubmit()" : undefined}
+>
+  <label class={labelClass}>
+    Année
+    <select id="periode" name="year" class={selectClass}>
+      {listePeriode.map((p) => <option selected={p === year} disabled={!existe(p, sex, age)}>{p}</option>)}
+    </select>
+  </label>
+  <label class={labelClass}>
+    Sexe
+    <select id="sexe" name="sex" class={selectClass}>
+      {listeSexe.map((s) => <option selected={s === sex} disabled={!existe(year, s, age)}>{s}</option>)}
+    </select>
+  </label>
+  <label class={labelClass}>
+    Âge
+    <select id="age" name="age" class={selectClass}>
+      {listeAge.map((a) => <option value={a} selected={a === age} disabled={!existe(year, sex, a)}>{a.trim()}</option>)}
+    </select>
+  </label>
+  {
+    serveur && (
+      <button
+        type="submit"
+        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      >
+        Afficher
+      </button>
+    )
+  }
+</form>
