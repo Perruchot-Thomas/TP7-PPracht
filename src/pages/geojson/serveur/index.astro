@@ -1,0 +1,6 @@
+---
+import CarteServeur from "../../../components/CarteServeur.astro";
+import { listeAge, listePeriode, listeSexe } from "../../../lib/population";
+---
+
+<CarteServeur year={listePeriode[0]} sex={listeSexe[0]} age={listeAge[0]} />

@@ -11,6 +11,21 @@ export function existe(year: number, sex: string, age: string) {
   return combinaisons.has(`${year}|${sex}|${age}`);
 }
 
+// Nom utilisable dans une URL : "De 15 à 24 ans " -> "de-15-a-24-ans"
+export function slug(texte: string | number) {
+  return String(texte)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-");
+}
+
+// URL de la page serveur pré-générée pour une combinaison de filtres
+export function urlServeur(year: number, sex: string, age: string) {
+  return `/geojson/serveur/${year}/${slug(sex)}/${slug(age)}`;
+}
+
 // Population par nom de département pour une année, un sexe et une tranche d'âge
 export function getPopulation(year: number, sex: string, age: string) {
   return new Map(

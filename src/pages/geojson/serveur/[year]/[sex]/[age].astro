@@ -1,0 +1,22 @@
+---
+import CarteServeur from "../../../../../components/CarteServeur.astro";
+import { existe, listeAge, listePeriode, listeSexe, slug } from "../../../../../lib/population";
+
+// Une page statique par combinaison qui a des données (site 100 % statique, sans fonction Netlify)
+export function getStaticPaths() {
+  return listePeriode.flatMap((year) =>
+    listeSexe.flatMap((sex) =>
+      listeAge
+        .filter((age) => existe(year, sex, age))
+        .map((age) => ({
+          params: { year: String(year), sex: slug(sex), age: slug(age) },
+          props: { year, sex, age },
+        })),
+    ),
+  );
+}
+
+const { year, sex, age } = Astro.props;
+---
+
+<CarteServeur year={year} sex={sex} age={age} />

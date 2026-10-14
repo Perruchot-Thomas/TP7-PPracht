@@ -35,7 +35,7 @@ const path = Astro.url.pathname.replace(/\/$/, "") || "/";
               <li>
                 <a
                   href={p.href}
-                  aria-current={path === p.href ? "page" : undefined}
+                  aria-current={path === p.href || path.startsWith(p.href + "/") ? "page" : undefined}
                   class="rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 aria-[current=page]:bg-indigo-50 aria-[current=page]:text-indigo-700"
                 >
                   {p.titre}
