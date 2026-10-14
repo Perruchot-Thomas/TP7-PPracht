@@ -1,7 +1,7 @@
 - URL site WEB :
 - URL Notebook Observable :
-- Nom :
-- Prénom :
+- Nom : Perruchot
+- Prénom :  Thomas
 - Nom binome :
 - Prénom binome :
 
